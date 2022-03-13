@@ -1,6 +1,7 @@
 import socket
 from .response import Response
 from .request import Request
+from .http_method import HttpMethod
 from .http_status import HttpStatus
 from .content_type import ContentType
 
@@ -13,8 +14,8 @@ class Http:
         self.__port = port
 
     def start(self):
-        # Starts listening
         s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
         try:
             s.bind((self.__host, self.__port))
         except socket.error as e:
@@ -29,24 +30,23 @@ class Http:
                 if data is None:
                     break
                 self.__handle_request(conn, data)
-                # print(conn)
-                # print(address)
-                print(data)
         except KeyboardInterrupt as e:
             print("Gracefully exiting...")
+            s.shutdown(socket.SHUT_RDWR)
             s.close()
             exit(0)
 
     def __handle_request(self, conn, data):
         request = Request(data)
-        print(request.get_formatted_request())
-        print(request.get_body())
-        print(request.get_http_method())
-        print(request.get_path())
-        # Check http version
+        body = ""
+        status = HttpStatus.OK
+        content_type = ContentType.PLAIN
 
         # Check if valid http method (only GET/POST supported)
+        method = request.get_http_method()
+        if method != HttpMethod.GET and method != HttpMethod.POST:
+            status = HttpStatus.NOT_IMPLEMENTED
 
         # Check if valid path
-        conn.sendall(Response(HttpStatus.OK, ContentType.PLAIN, "Empty").build())
+        conn.sendall(Response(status, content_type, body).build())
         conn.close()
