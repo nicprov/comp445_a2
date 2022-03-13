@@ -20,22 +20,24 @@ class HttpResponse:
         self.__content_type = content_type
         self.__body = body
         self.__headers = []
+        self.__raw = ""
 
     def add_header(self, key, value):
         self.__headers.append((key, value))
 
     def build(self):
-        resp = "HTTP/{0} {1} {2}{3}".format(HTTP_VERSION, int(self.__status), self.__status, LINE_BREAK)
-        resp += "Server: {0}{1}".format(SERVER, LINE_BREAK)
-        resp += "Date: {0}{1}".format(get_http_date(), LINE_BREAK)
-        resp += "Content-Type: {0}{1}".format(self.__content_type, LINE_BREAK)
-        resp += "Connection: close{0}".format(LINE_BREAK)
-        resp += "Content-Length: {0}{1}".format(len(self.__body.encode()), LINE_BREAK)
+        self.__raw = ""
+        self.__raw = "HTTP/{0} {1} {2}{3}".format(HTTP_VERSION, int(self.__status), self.__status, LINE_BREAK)
+        self.__raw += "Server: {0}{1}".format(SERVER, LINE_BREAK)
+        self.__raw += "Date: {0}{1}".format(get_http_date(), LINE_BREAK)
+        self.__raw += "Content-Type: {0}{1}".format(self.__content_type, LINE_BREAK)
+        self.__raw += "Connection: close{0}".format(LINE_BREAK)
+        self.__raw += "Content-Length: {0}{1}".format(len(self.__body.encode()), LINE_BREAK)
 
         for header in self.__headers:
-            resp += "{0}: {1}{2}".format(header[0], header[1], LINE_BREAK)
+            self.__raw += "{0}: {1}{2}".format(header[0], header[1], LINE_BREAK)
 
-        resp += LINE_BREAK
-        resp += self.__body
-        resp += LINE_BREAK
-        return resp.encode()
+        self.__raw += LINE_BREAK
+        self.__raw += self.__body
+        self.__raw += LINE_BREAK
+        return self.__raw

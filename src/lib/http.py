@@ -10,8 +10,9 @@ BUFFER_SIZE = 1024
 
 
 class Http:
-    def __init__(self, host, port, data_dir="."):
-        self.__host = host
+    def __init__(self, verbose, port, data_dir="."):
+        self.__verbose = verbose
+        self.__host = "localhost"
         self.__port = port
         self.__fileManager = FileManager(data_dir)
 
@@ -54,5 +55,11 @@ class Http:
             elif request.get_path().startswith("/") and request.get_http_method() == HttpMethod.POST:
                 response = self.__fileManager.create_file(request.get_path(), request.get_body())
 
-        conn.sendall(response)
+        if self.__verbose:
+            print("-----REQUEST RECEIVED-----\n")
+            print(request.get_formatted_request())
+            print("-----SENDING RESPONSE-----\n")
+            print(response)
+
+        conn.sendall(response.encode())
         conn.close()
