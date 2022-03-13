@@ -13,11 +13,10 @@ class HttpStatus(Enum):
     UNAUTHORIZED = ("Unauthorized", 401)
     FORBIDDEN = ("Forbidden", 403)
     NOT_FOUND = ("Not Found", 404)
-    UNSUPPORTED_MEDIA_TYPE = ("Unsupported Media Type", 415)
-    I_AM_A_TEAPOT = ("I'm a teapot", 418)
     INTERNAL_SERVER_ERROR = ("Internal Server Error", 500)
     NOT_IMPLEMENTED = ("Not Implemented", 501)
-    HTTP_VERSION_NOT_SUPPORTED = ("HTTP Version Not Supported", 505)
+    BAD_GATEWAY = ("Bad Gateway", 502)
+    HTTP_VERSION_NOT_SUPPORTED = ("Service Unavailable", 503)
 
     def __str__(self):
         return self.value[0]
