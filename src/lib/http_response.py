@@ -1,6 +1,4 @@
-from wsgiref.handlers import format_date_time
 from datetime import datetime
-from time import mktime
 
 HTTP_VERSION = 1.0
 SERVER = "test"
@@ -16,8 +14,8 @@ def get_http_date():
                                                     date.year, date.hour, date.minute, date.second)
 
 
-class Response:
-    def __init__(self, status, content_type, body):
+class HttpResponse:
+    def __init__(self, status, content_type, body=""):
         self.__status = status
         self.__content_type = content_type
         self.__body = body

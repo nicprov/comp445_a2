@@ -1,7 +1,7 @@
 LINE_BREAK = "\r\n"
 
 
-class Request:
+class HttpRequest:
     def __init__(self, raw):
         self.__raw = raw.decode().split(LINE_BREAK)
 

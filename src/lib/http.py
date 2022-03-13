@@ -1,17 +1,19 @@
 import socket
-from .response import Response
-from .request import Request
+from .http_response import HttpResponse
+from .http_request import HttpRequest
 from .http_method import HttpMethod
 from .http_status import HttpStatus
+from .file_manager import FileManager
 from .content_type import ContentType
 
 BUFFER_SIZE = 1024
 
 
 class Http:
-    def __init__(self, host, port):
+    def __init__(self, host, port, data_dir="."):
         self.__host = host
         self.__port = port
+        self.__fileManager = FileManager(data_dir)
 
     def start(self):
         s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -37,16 +39,20 @@ class Http:
             exit(0)
 
     def __handle_request(self, conn, data):
-        request = Request(data)
-        body = ""
-        status = HttpStatus.OK
-        content_type = ContentType.PLAIN
+        request = HttpRequest(data)
+        response = None
 
         # Check if valid http method (only GET/POST supported)
         method = request.get_http_method()
         if method != HttpMethod.GET and method != HttpMethod.POST:
-            status = HttpStatus.NOT_IMPLEMENTED
+            response = HttpResponse(HttpStatus.NOT_IMPLEMENTED, ContentType.PLAIN).build()
+        else:
+            if request.get_path() == "/" and request.get_http_method() == HttpMethod.GET:
+                response = self.__fileManager.get_list_of_files()
+            elif request.get_path().startswith("/") and request.get_http_method() == HttpMethod.GET:
+                response = self.__fileManager.get_file(request.get_path())
+            elif request.get_path().startswith("/") and request.get_http_method() == HttpMethod.POST:
+                response = self.__fileManager.create_file(request.get_path(), request.get_body())
 
-        # Check if valid path
-        conn.sendall(Response(status, content_type, body).build())
+        conn.sendall(response)
         conn.close()
