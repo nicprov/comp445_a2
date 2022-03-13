@@ -1,9 +1,8 @@
 import socket
 from .response import Response
+from .request import Request
 from .http_status import HttpStatus
 from .content_type import ContentType
-from urllib.parse import urlparse
-from .http_method import HttpMethod
 
 BUFFER_SIZE = 1024
 
@@ -29,12 +28,25 @@ class Http:
                 data = conn.recv(BUFFER_SIZE)
                 if data is None:
                     break
-                conn.sendall(Response(HttpStatus.OK, ContentType.PLAIN, "Empty").build())
-                conn.close()
+                self.__handle_request(conn, data)
                 # print(conn)
                 # print(address)
-                # print(data)
+                print(data)
         except KeyboardInterrupt as e:
             print("Gracefully exiting...")
-            s.detach()
+            s.close()
             exit(0)
+
+    def __handle_request(self, conn, data):
+        request = Request(data)
+        print(request.get_formatted_request())
+        print(request.get_body())
+        print(request.get_http_method())
+        print(request.get_path())
+        # Check http version
+
+        # Check if valid http method (only GET/POST supported)
+
+        # Check if valid path
+        conn.sendall(Response(HttpStatus.OK, ContentType.PLAIN, "Empty").build())
+        conn.close()
