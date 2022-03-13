@@ -18,7 +18,12 @@ class Request:
         return self.__raw[0].split(" ")[0]
 
     def get_path(self):
-        return self.__raw[0].split(" ")[1]
+        path = self.__raw[0].split(" ")[1]
+        return path.split("?")[0]
+
+    def get_query_params(self):
+        path = self.__raw[0].split(" ")[1]
+        return path.split("?")[1]
 
     def get_header(self, header):
         for line in self.__raw:
